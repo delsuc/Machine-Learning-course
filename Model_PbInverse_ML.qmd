@@ -1,0 +1,994 @@
+---
+title: "Data Modelling and Data Analysis"
+subtitle: "theory and some examples"
+author: "*M-A Delsuc - IGBMC - Université de Strasbourg*<br><small>*produced with [Quarto](https://quarto.org) & [reveal](https://revealjs.com)*<br>CC 4.0 BY</small>"
+date: ""
+format:
+    revealjs:
+        theme: simple
+        smaller: false
+        scrollable: true
+        transition: slide
+        progress: true
+        link-external-icon: true
+        number-sections: false
+        number-depth: 1
+        toc: true
+        toc-depth: 1
+        toc-title: "Overview"
+        footer: ""
+        slide-number: true
+        embed-resources: true
+        jupyter: python3
+execute:
+    echo: true
+    keep-ipynb: true
+    cache: true
+preview-links: auto
+css: styleMAD.css
+=>: $\Rightarrow$
+---
+
+## code {visibility="hidden"}
+```{python}
+# import tools
+import numpy as np
+import scipy as sci
+import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt
+from IPython.display import Markdown, display
+```
+
+# Model Data Analysis
+## Galileo Galilei - 1 -
+
+Big change in XV^e^ XVI^e^ - observation comes first !
+
+:::::::::::::: {.columns}
+::: {.column width="30%"}
+![Galileo, Pise 1564 -  Florence 1642](images/pasted-image-191.png){width=50%}
+:::
+::: {.column width="70%"}
+![Galileo observation of the moon with the naked eye ](images/Galileos_Moon.jpg){width=60%}
+:::
+::::::::::::::
+
+*(source Wikipedia)*
+
+## Galileo Galilei - 2 -
+One example
+
+![](images/pasted-image-182.png){width=50%} ... 
+![](images/pasted-image-938.png){width=40%}
+
+bells allow to measure time
+
+force is constant
+$\Rightarrow$ acceleration is constant
+$\Rightarrow$ speed grows linearly
+$\Rightarrow$ distance grows quadratically
+
+*(source Wikipedia)*
+
+## Galileo Galilei - 3 -
+Well known example
+
+![](images/Galilee2.png){width=100%}
+
+*(source Wikipedia)*
+
+## van Leeuwenhoek - 1 -
+
+::: {#fig-VL layout-ncol=2}
+
+![van Leeuwenhoek late XVII^e^,](images/Leeuwenhoek.jpg){width=50%}
+
+![Invent the first microscope](images/Leeuwenhoek_Microscope.png){width=20%}
+
+and discover cells...   *(sources Wikipedia)*
+
+:::
+## today in biophysics
+![](images/modele1.png){fig-alt="The machine on which I made my first NMR experiment in 1978!"}
+
+
+## today in biophysics
+![](images/biophysique1.png)
+
+## today in biophysics
+![](images/biophysique2.png)
+
+# We need data
+## Data can be anything
+
+![](images/csv1.png){fig-align=center}
+
+A Dataset is a set of points in a multidimensionnel space.
+
+:::: {.columns}
+
+::: {.column width="50%"}
+- numerical values
+- numerical values with error bars !
+- dates
+- texts
+:::
+
+::: {.column width="50%"}
+- classification value
+    - colors
+    - yes/no
+    - quantiles
+    - etc...*
+:::
+
+::::
+
+However the number of dimension can be large !
+
+## large dimension spaces are very *unatural* to us {auto-animate=true}
+
+
+Law of large numbers
+
+::: {layout="[1,1]"}
+![binomial law with 10 draws](images/binom.png)
+
+![with large nb of draw](images/binomN.png)
+:::
+
+:::{.center}
+*With a large number of draw, every stochastic law becomes predictive*
+:::
+
+## large dimension spaces are very *unatural* to us {auto-animate=true}
+
+Law of truly large numbers: 
+
+::: {layout="[[14,10,10]], [35]"}
+![FTICR-MS fid, 8 million points ~ 1 sec acqu.<br>I have thousand of these](images/image1.png)
+
+![zoomed](images/image2.png)
+
+![re-zoomed](images/image3.png)
+:::
+![](images/image5.png){fig-align="center" width=600 height=200}
+
+. . .
+
+:::{.center}
+*even VERY unlikely events will be occur*
+:::
+
+
+## large dimension spaces are very *unatural* to us {auto-animate=true}
+
+::: {layout="[[7,10, -5, 10,10], [7,10, -5, 10, 10]]"}
+![1D random distribution](images/distrib_1D.png)
+
+![distance histogram](images/dist_1D.png)
+
+![distance histogram](images/dist_10D.png)
+
+![](images/dist_100D.png)
+
+![2D random distribution](images/distrib_2D.png)
+
+![distance histogram](images/dist_2D.png)
+
+![distance to center histogram](images/inter_10D.png)
+
+![](images/inter_1000D.png)
+:::
+
+. . .
+
+:::{.center}
+*All points are at the same distance !*
+:::
+
+## large dimension spaces are very *unatural* to us {auto-animate=true}
+
+::: {layout="[[10,10], [10, 10]]"}
+![random matrices and their $AA^t$ product](images/rand3.png)
+
+![](images/rand10.png)
+
+![](images/rand100.png)
+
+![](images/rand1000D.png)
+
+:::
+
+. . .
+
+:::{.center}
+*All random matrices are inversible !*
+:::
+
+# We need a model
+##  Model can be anything
+
+- analogic model
+    - example of Galileo ramp
+- analytical equation
+    newton equations of movement
+    most of the physic we learn / we teach
+- image
+    - the cell / microscopy
+- computer program
+    - any kind of program modelling the system
+        - molecular modelling
+        - Ecological,
+        - Climate,
+        - ...
+    - modelling the measure
+        - denoising / debluring
+
+
+
+## Size matters {.smallest #sec-size}
+
+### The measure $y$ is described by some function $T_f() \quad$  the *"model"*
+
+- 
+::: {.left}
+$y = T_f(x) + \epsilon$
+:::
+::: {.right}
+$\epsilon$ is the *"noise"*
+:::
+- 
+::: {.left}
+with $y$, we measured $N$ points
+:::
+::: {.right}
+$y$ is the *"measure"*
+:::
+-
+::: {.left}
+the model $x$ contains $P$ parameters 
+:::
+::: {.right}
+ $x$  is the *"result"*
+:::
+
+### $N > P$ -- classical case -- "fit"
+- fit of the parameters onto the data
+- **modelling the phenomenon**
+
+### $N = P$  -- a special case -- "transformation"
+
+-
+::: {.left}
+requires an estimate of the inverse of $T_f()$
+:::
+- **modelling the measure**
+
+### $N < P$  -- the *inverse* problem -- "reconstruction"
+
+- requires a-priori knowledge
+- **modelling the knowledge**
+
+# $N>P$ Fit  
+modelling the phenomenon
+
+## simple example: {shrink=40}
+![](images/L1L2_1.png){width=40%}
+![](images/L1L2_2.png){width=40%}
+
+![](images/L1L2_3.png){width=40%}
+![](images/L1L2_4.png){width=40%}
+
+Top, scattered measures with approximate linear dependence
+
+Bottom, linear fit using  $\ell_2$ or $\ell_1$ norms, in presence or absence of *outliers*
+
+## Algorithmic 
+We simply try to find the model $x$ minimize the distance $d()$ between the measure $y$ and modelled measure $T_f(x)$ :
+$\hat{x}$ such that $$d( T_f(\hat{x}), y)$$
+is minimum.
+
+The distance can be either the *Cartesian* distance:
+$$d(a,b) = \sum_i (a_i - b_i)^2$$
+(also called the $\ell_2$ norm) 
+but can **any** other *norm*,
+
+. . .
+
+::: {.smallest}
+- for instance the $\quad \ell_1$ norm:$\ell_1(a,b) = \sum_i |a_i - b_i|$
+- or the *cosine pseudo-norm*: $\quad d_c(a,b) = \cos(a,b) = \Vert a\Vert \Vert b \Vert \cos(\theta) \quad$ where $\cos(\theta)$ is the angle in the multidimensionnal vector space
+    - this is more commonly used as the *cosine similarity* equal to 1.0 when both vectors are proportional
+- or the *spectral norm* $\quad d_S(a,b) = \sum_i(\sigma(a-b)_i) \quad$ where  $\sigma(M)_i$  is the *i^th^* singular value of the matrix $M$.
+- *or anything else...*
+:::
+
+## code
+```{python}
+#| output-location: slide
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+# define utilities
+def costL1(sol):
+    "cost function implementing L1 norm"
+    a,b = sol
+    y = a*xdata+b
+    return sum(abs(y-ydata))
+def costL2(sol):
+    "cost function implementing L2 norm"
+    a,b = sol
+    y = a*xdata+b
+    return np.sqrt(sum((y-ydata)**2))
+def draw(sol,label=None):
+    "draw the results"
+    a = sol[0]
+    b = sol[1]
+    plt.plot(xdata, a*xdata+b, label=label)
+
+# set-up scene
+N = 20
+xdata = np.linspace(-10,10,N)
+ydata = xdata + np.random.randn(N)
+plt.figure()
+plt.plot(xdata, ydata, 'o')     # first image
+# do it
+d = plt.subplot(111)
+plt.plot(xdata,ydata,'o')
+plt.plot(xdata,xdata,':',label='True')
+ini = [0,0]
+resL1 = minimize(costL1, ini)
+draw(resL1.x,'$L_1$')
+resL2 = minimize(costL2, ini)
+draw(resL2.x,'$L_2$')
+plt.legend(loc=0)
+d.set_xlim(xmin=-11,xmax=11)
+plt.show()
+
+display(Markdown("""
+when the $\ell_2$ (Cartesian) norm is used, the result is said to be the **Maximum Likelyhood** solution or **ML** solution *(le Maximum de vraisemblance)*
+"""))
+```
+
+
+## $\ell_p$ norms
+
+### $\ell_2$ norm
+classical Cartesian norm
+$$
+\ell_2(x) = \sqrt{\sum x_i^2}
+$$
+
+### $\ell_1$ norm
+$$
+\ell_1 = \sum|x_i|
+$$
+
+$\ell_1$ minimizes outliers impact
+-- **More robust** than $\ell_2$ *see program above*
+
+### the general $\ell_p$ norms
+$$
+\ell_p(x) = \sqrt[p]{\sum |x_i|^p}
+$$
+
+$$
+\lim_{p \rightarrow \infty} \ell_p =  \ell_\infty (x) = \max_i(x_i)
+$$
+
+## simple example: {shrink=40}
+![](images/L1L2_1.png){width=40%}
+![](images/L1L2_2.png){width=40%}
+
+![](images/L1L2_3.png){width=40%}
+![](images/L1L2_4.png){width=40%}
+
+Top, scattered measures with approximate linear dependence
+
+Bottom, linear fit using  $\ell_2$ or $\ell_1$ norms, in presence or absence of *outliers*
+
+
+# $N=P$ transformation 
+modelling the measure
+
+## Basic theory
+we have
+$$y = T_f(x) + \epsilon \quad$$
+and $x$ and $y$ have same "size"
+
+Assume that $T_f$ we can estimate an inverse $T_f^{-1}$ the *reconstruction* operator.<br>
+( *easy if* $\, T_f() \,$ *is linear* - doable otherwise - )
+
+Then we can find an estimate $\hat{x}$ of the model as
+$$\hat{x} = T_f^{-1}(y)$$
+
+Of course $\hat{x}$ is different from $x$, because of the noise in the measurement.
+
+But it is probably *close*, and in certain cases, can be proven to be the **Minimum Mean Square Error** solution.
+
+This approach can even be applied in the previous "fit" approach where $N>P$.
+
+## Transforms
+There are many such cases, in particular
+
+- the **Fourier transform** the most used and known transform
+
+::: {layout-ncol=2}
+![](images/fid.png)
+Fourier Transform $$\Rightarrow$$
+- in NMR, <br>
+- Orbitrap-MS, <br>
+- FTICR-MS , <br>
+- FTIR ...
+
+![](images/sp1.png)
+:::
+
+## Transforms
+There are many such cases, in particular
+
+::: {.incremental}
+- the **Fourier transform** the most used and known transform
+    - linear / non-local / inversible / orthogonal
+- **Hadamard** transform
+    - related to Fourier transform on {-1, 1}
+    - linear / non-local / inversible / orthogonal
+- **wavelet** transform
+    - transform on local frequencies
+    - linear / semi-local / inversible / non-orthogonal
+- **Hilbert** transform
+    - related to Fourier transform
+    - relates real and imaginary parts of an analytical signal
+    - linear / local / inversible / orthogonal
+- **Laplace** transform
+    - transform on real exponential function basis
+    - linear / non-local / non-inversible
+:::
+
+## Transforms
+All these transform are **linear**
+
+- sum of $T$ = $T$ of sum
+- quantitative
+- some of these transform are inversible (Fourier, Hilbert, wavelet, ...)
+
+They can thus be expressed as **square** matrices  ( $N = P$ )  (eventually inversible)
+
+
+# $N<P$ reconstruction
+modelling knowledge
+
+## *a-priori* information
+<br>
+
+In many cases the measure is limited, and *smaller* than the system under study.
+
+If we want to model the system, there is more degrees of freedom in the model $(P)$ than in the measure $(N)$.
+To handle this we need to have additional information, some kind of *a-priori* .
+<br><br>
+
+There are **many** cases and **many** ways to implement this *a-priori*
+
+
+## Different possibilities
+
+#### using general principles
+- positivity, symetry, ...
+- sparcity ...
+- regularisation
+
+#### using a program as an *a-priori*
+- parameterized modelling of the system:
+    - molecular modelling
+    - system biology
+    - meteo, ...
+<br><br>
+
+#### Machine Learning {.center}
+two different approaches:
+
+::: {layout-ncol=2}
+
+### Statistical modelling
+eg: PCA, SVM, Random Forest,...
+
+### Deep Neural Networks
+to be seen later...
+
+:::
+
+
+# Algorithmic Background for Machine Learning 
+
+## General Approaches
+
+### classification
+supervised (classification)
+: given exemples along with "labels" try to infer the labels from the data.
+
+unsupervised (clustering)
+: given exemples with no "labels", try to define homogeneous classes.
+
+dimension reduction 
+: just draw *(2D, eventually 3D)* this multidimentional dataset
+
+### quantification
+- Regression
+- Interpolation
+- Extrapolation
+- Inversion
+
+## linear regression {auto-animate="true"}
+
+#### linear relationship between measure and test
+- measure $Y$
+- *Truth* (estimated on a subset) $X$
+- relation (unknown) $A$
+$$
+X = A Y + \epsilon
+$$
+
+find $A'$ such that  $|| X - A'Y ||^2$
+
+is minimum *( actually any kind of meaningful distance)*
+
+- optimisation problem
+	- gradients method 
+	- stochastic gradient
+    - newton method
+	- ...
+
+$A$ matrix
+
+allows to *predict* $X$ for additional measures
+
+## non-linear regression {auto-animate="true"}
+
+#### non-linear relationship between measure and test
+- measure $Y$
+- *Truth* (estimated on a subset) $X$
+- relation (unknown) $T()$
+$$
+X = T(Y) + \epsilon
+$$
+
+find $T'$ such that  $|| X - T(Y) ||^2$
+
+is minimum *( actually any kind of meaningful distance)*
+
+- optimisation problem
+	- gradients method 
+	- stochastic gradient
+    - newton method
+	- ...
+
+$T'$ operator
+
+allows to *predict* $X$ for additional measures
+
+
+## Pre-Processing
+Some time, it is needed to pre-process data to get robust results
+
+### continuous data
+To equalize different variables, it can be needed to normalize each variable in meand and standard deviation
+$\Rightarrow$
+replace $y_i$ by $y'_i = \frac{y_i - \bar{y}}{\sigma_y}$
+
+### dichotomic data
+True/False - presence/absence $\Rightarrow$ code 
+
+- as `[0,1]`
+- or as `proba value`
+
+### nominative data
+2 or more values (protein/gene names, G.O. functions, ...)
+$\Rightarrow$ code on `[1,2...n]` trying to follow a logical order if possible
+
+## logistic  correction
+If $X$ varies from -1.0 to 1.0 (or any other interval)
+
+- IC50, fixation %, etc...
+
+transform $X$ in *sigmoïde* (even $Y$ sometimes)
+
+![sigmoïde $\tanh(x)$](images/sigmoid.png){width=80%}
+
+## regularisation
+Add a **Regularisation** to the optimisation problem to constaint the solution to an *a-priori*
+
+find $A'$ such that 
+
+- $|| X - A'Y ||_2$ is minimum 
+- and $\phi(A)$ minimum, where $\phi()$ is a function which represents what we know *a-priori*
+	- $A$ positive eg: $\phi(A) = \sum_{k,a_k<0}|a_k|$ 
+	- $A$ values borned
+	- or  symetries
+    - maximize the number of null values == *sparse*
+        - one can proove that $\phi(A) = ||A||_1$ does the trick
+        - this is the basis of the "Compressed Sensing" approach
+	- minimize the local variation of $A$ 
+
+
+## *as less hypothesis as possible* {auto-animate="true"}
+
+- use the *most probable* model $\Rightarrow$ compare models !
+    - use Bayes equation forsolution probability *(see [@sec-bayes])*
+    - *Maximum Entropy* type analyses
+
+estimate *Entropy of A* in Shannon sense:
+$$\phi(A) = S_A = - \sum_{k} a_k\log a_k$$
+
+Entropy $\equiv$ inverse of information
+
+$\Rightarrow$ maximise entropy $\equiv$ minimise information used to reconstruct solution
+ 
+
+## *as less hypothesis as possible -- Occam razor* {auto-animate="true"}
+English franciscan borther Guillaume d'Ockham (v. 1285 - 1347),
+
+- *Pluralitas non est ponenda sine necessitate*
+- Plurality should not be posited without necessity
+- les multiples ne doivent pas être utilisés sans nécessité 
+
+. . .
+
+![](images/nom_de_la_rose.jpeg){width=30%} *source Wikipedia*
+
+## Convexity
+The target function value draws a surface depending on the parameters
+$\quad D(P_m)/Y_n^{mes}$
+
+which can be convex or not
+
+![convex / non-convex, here in 2 dimensions](images/convexe.jpeg){width=45%}
+
+:::: {.columns}
+::: {.column width="60%"}
+- unique minimum or multiple minima! 
+:::
+::: {.column width="40%"}
+- algorithmic is very different ! 
+:::
+::::
+
+$L_1$ et $L_2$ are convex, but problem convexity depends also on the model.
+
+## Deep Learning
+*Ad Hoc* General Model, based on *neural network* kind of computation 
+
+![](images/deep1.png){width=70%}
+*source Wikipedia*
+
+Universal model, with **millions/billions** of parameters
+
+:::: {.columns}
+::: {.column width="30%"}
+$P \gg N$ 
+
+**Non Convex** ! 
+
+:::
+::: {.column width="70%"}
+$\Rightarrow$ *training* on a large series of examples
+
+$\Rightarrow$  Algo:  **SGD**: **S**tochastic **G**radient **D**escent
+:::
+::::
+
+- The randomness in the algo smoothes out the differences, and builds a general model.
+- The *Law of Large Numbers* plays here $\Rightarrow$ quasi-deterministic
+- Equivalent to an implicit regularisation, but *which one* ? --- possibly **Entropy**
+
+**BUT** it is a perfect Black-Box
+
+
+## Deep-Learning analysis examples {auto-animate="true"}
+
+![](images/nature.png)
+
+## Deep-Learning analysis examples {auto-animate="true"}
+![](images/IAMS1.png)
+
+## Deep-Learning analysis examples {auto-animate="true"}
+![](images/IAMS2.png)
+
+## Deep-Learning analysis examples {auto-animate="true"}
+
+![](images/alphafold2.png){width=80%}
+
+. . .
+
+### And of-course Chat-GPT
+
+*guess what ?*
+
+## What is happeing here ?
+
+### Remember [@sec-size]{.tiny}
+:::{.tiny}
+#### $N > P$ -- classical case -- "fit"
+- fit of the parameters onto the data
+- **modelling the phenomenon**
+
+#### $N = P$  -- a special case -- "transformation"
+
+- requires an estimate of the inverse of $T_f()$
+- **modelling the measure**
+
+#### $N < P$  -- the *inverse* problem -- "reconstruction"
+
+- requires a-priori knowledge
+- **modelling the knowledge**
+:::
+
+### Here --- both $N$ and $P$ are huge
+
+- implicit data model (phenomenon) thanks to **Neural Network structure**
+- implicit measure space (measure) thanks to **training set** 
+- implicit regularisation (knowledge) thanks to **convergence algo**
+
+what do we control ?
+
+# Quality control
+
+## cross validation
+
+From a data-set, a model is built ( *learned* )
+which allows to predict or class new data.
+
+cross validation allows to verify the quality of the model
+
+- use two data-set: one for training / one for test
+    - measure cost function / computes costs on test set
+    - $\Rightarrow$ test extrapolation/interpolation capabilities
+- *Jack knife*: use the whole data but  remove one element from dataset,
+then check the prediction for that one
+	- does this for all elements !
+	- or on a subset
+- ...
+
+## Allows to chek quality 
+- underfit
+    - *did not extract all possible information*
+- overfit 
+    - *interpret noise*  **very common/very dangerous**
+
+
+
+# Other methods
+There is whole variety of methods, and new ones are proposed every week !
+
+but they differ in
+
+- being used or not
+- efficiency
+- speed
+- robustness
+- accessibility
+- ...
+
+
+# a little statistics
+## Confusion Matrix
+
+Let's assume we make a test - PCR test for COVID-19 for instance.
+The test is said **positive** if a the target sequence is expressed over a given threshold, negative otherwise.
+
+However, there are fluctuations, (in the kit, in the sample, in the cycles, ...)
+
+so several possible outcomes:
+
+|        |real  |      T       |      F       |
+|--------|:----:|:------------:|:------------:|
+|  test  | T    | True Positive | False  Positive |
+|        | F    | False Negative | True Negative |
+
+easy to define for $N$-valued tests...
+
+## Characteristic Values {shrink=20}
+
+::: {layout-ncol=2}
+
+-  Positive Predictive Value
+$$PPV = \frac {TP}{TP + FP}$$
+- Negative Predictive Value
+$$NPV = \frac {TN}{TN + FN}$$
+- sensitivity   *how good is detection of real positives*
+
+$$\text{sensitivity} = \frac{TP}{TP+FN}$$
+- selectivity *how good is rejection of real negatives*
+$$\text{selectivity} = \frac{TN}{FP+TN}$$
+
+:::
+
+- Matthews Correlation Coefficient (MCC) 
+*how good is the test altogether*
+$$MCC = \frac{TP \times TN - FP \times FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}$$
+
+
+## one example from Wikipedia {shrink=30}
+![en.wikipedia.org/wiki/Positive_and_negative_predictive_values](images/table.png)
+
+here $MCC = 0.23$
+
+## False Discovery Rate
+
+Important parameter, used to *calibrate* a method
+$$FDR = \frac{\text{False Positive}}{\text{All Positive}}$$
+$$FDR = \frac {FP}{TP + FP}$$
+$$FDR = 1-PPV$$
+
+- in previous example (bowel cancer)
+    - FDR = 180/200 = 90%
+
+
+## ROC curve {shrink=20}
+- Sensitivity / Specificity
+$$\phantom{(1-)} \text{Sensitivity} = \text{True Positive Rate} = \frac{TP}{TP+FN}$$
+$$(1 - \text{Selectivity}) = \text{False Positive Rate} = \frac{TN}{FP+TN}$$
+
+![](images/roc2.png){width=35%}
+![](images/roc.png){width=30%}
+
+en.wikipedia.org/wiki/Receiver_operating_characteristic
+
+- AUC: area under the ROC curve
+    - allows to numerically compare methods
+
+
+## z-score
+- for a measure  $X_i$ with mean $\bar{X}$ and standard deviation $\sigma$
+$$z_i = \frac{X_i - \bar{X}}{\sigma}$$
+
+- characterizes a measure (amount of info present in each $X_i$)
+- characterizes a method (how it separates from the mean statistic)
+    - with its mean $\bar{z} = <z_i>$
+    - and $z_{min}$, $z_{max}$
+
+## example with a Gaussian
+![en.wikipedia.org/wiki/Standard_score](images/z-score1.png){width=80%}
+
+
+# Examples
+
+## testing the whole population for COVID-19
+### Simple idea
+Test everybody, and we can control the pandemic !
+
+### the test:
+- 95% selectivity *(one False Negative for 20 tested positive people)*
+- 95% specificity *(one False Positive for 20 tested negative people)*
+- 10% population positive
+
+### it comes
+- TP = 0.1*0.95 = 9.5 %
+- FP = 0.05*0.9 = 4.5 %
+- PPV = TP / (TP+FP) = 4.5 % / 14 % = 32 %
+- $\Rightarrow$ FDR = 1-PPV = 68% !!!
+
+### one person is tested positive
+- only 60 % risk of being positive
+
+## searching for an "Algorithm" to detect terrorists{shrink=20}
+### an idea of French members of parliament (in 2019)
+Find an "algorithm" which detect terrorists form a measure of "every possible" things
+
+- *phones - cameras - mails -  web - ...* :
+
+### Rough estimate
+- Number of adult residents in France : 50M
+- Number of possible terrorists in France : 1000
+
+### effect of varying selectivities
+![same ROC curve as previously but in $\log x$](images/roc4.png){width=65%}
+
+## Selectivity and Sensitivity are linked {shrink=20}
+. . .
+
+- Selectivity 90%
+    - detected: TP = 990 $\quad$ FP = 5M  $\quad$total = **5.000.990**
+    - 5M detected as terrorists
+    - 10 terrorists are undetected
+    - Sensitivity = 99%
+
+. . .
+
+- Selectivity 99%
+    - detected: TP = 910 $\quad$  FP = 500k $\quad$ total = **500.910**
+    - 500k detected as terrorists
+    - 90 terrorists are undetected
+    - Sensitivity = 91%
+
+. . .
+
+- Selectivity 99.6%
+    - detected: TP = 800  $\quad$ FP = 200k $\quad$ total = **200.800**
+    - 200k detected as terrorists
+    - 200 terrorists are undetected
+    - Sensitivity = 80%
+
+. . .
+
+- Selectivity 99.9%
+    - detected: TP = 500 $\quad$ FP = 50k $\quad$ total = **50.500**
+    - 50k detected as terrorists
+    - 500 terrorists are undetected
+    - Sensitivity = 50%
+
+. . .
+
+- Selectivity 99.99%
+    - detected: TP = 90 $\quad$ FP = 5k $\quad$ total = **5.090**
+    - 5k detected as terrorists
+    - 910 terrorists are undetected
+    - Sensitivity = 9% - yet FDR = 98%
+
+
+## Bayesian approach {#sec-bayes}
+### Bayes theorem
+
+assumes
+
+- $T$ probability of a "positive" test
+- $H$ hypothesis to test
+
+then
+$$P(H/T) = \frac{P(T/H) P(H)} {P(T)}$$
+
+- where
+    - $P(T/H)$: probability of a positive test: $PPV$ $\Rightarrow$ what we get
+    - $P(H/T)$: probability of a True Positive: $TP$ $\Rightarrow$ what we want
+    - $P(H)$: what I know about the system: $\Rightarrow$ *a-priori*
+    - $P(T)$: what I know about the test: $\Rightarrow$ *a-priori*
+
+## examples
+### AIDS test example
+probability that a Positive test is a FP when the testee is
+$$P(AIDS/Positive,context) = \frac{P(Positive/AIDS, context) \quad P(AIDS/context)} {P(Positive/context)}$$
+
+- a 76 years person, with very limited social life
+- a 26 years person, with active social and sexual life
+
+### terrorist example
+
+- which *a-priori* ... ?
+$\qquad P(Terrorist / context)$
+- THE ETHICAL problem of AI
+    - social filtering
+    - pre-selection
+- not present in the training set 
+- or worse: present in the training set *(selection biais - biaised training set)*
+
+# TOOLS
+
+## scikit-learn
+
+### python reference code: http://scikit-learn.orgplain}
+- THE general purpose library for Machine Learning 
+- complete
+- constant evolution
+![](images/scikit-learn-site.png){height=70%}
+
+## How to
+
+![scikit-learn.org/stable/tutorial/machine_learning_map/index.html](images/scikit-learn.png){width=100%}
+
+## but also
+Available free, open-source tools in `python`
+
+### general tools for Science
+- `numpy`: tools for general mathematical and array handling
+- `scipy`: advanced mathematical and statistical tools
+- `matplotlib`: generic ploting library
+
+### Datascience
+- `Pandas`: Data handling
+- `scikit-learn`: Machine-Learning
+
+### Deep Learning
+- `Pytorch`: originally created by academic, developed by Facebook, released in 2016
+- `Tensorflow`: developed by Google, released in 2015
+

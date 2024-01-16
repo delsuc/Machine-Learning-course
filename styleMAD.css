@@ -1,0 +1,71 @@
+.red {
+  color: red;
+}
+
+.illustration {
+  border: 1px solid rgb(230, 230, 230); 
+}
+
+.tiny {
+  font-size: 12pt;
+}
+.smallest {
+  font-size: 16pt;
+  line-height: 1.1;
+}
+.yellowbg {
+  background-color: rgb(255, 255, 63);
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.caption {
+  text-align: center;
+  font-style: italic;
+}
+
+.reveal .slide figure > figcaption {
+  text-align: center;
+  font-style: italic;
+}
+
+.reveal .slide-logo {
+  max-height: 7rem !important;
+}
+
+.reveal .progress {
+  height: 10px;
+}
+
+.reveal {
+  font-size: 18pt;
+}
+
+.reveal .slide ul li {
+margin-top: 0.1em !important;
+margin-bottom: 0.1em !important;
+}
+
+.reveal h2 {
+  text-align: center;
+}
+
+/* SIZE MATTERS*/
+#size-matters > ul {
+  width: 74%;
+}
+
+#size-matters > ul > li {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* 
+*/
