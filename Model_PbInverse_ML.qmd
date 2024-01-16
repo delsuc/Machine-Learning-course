@@ -23,7 +23,7 @@ format:
 execute:
     echo: true
     keep-ipynb: true
-    cache: true
+    cache: false
 preview-links: auto
 css: styleMAD.css
 =>: $\Rightarrow$
@@ -433,7 +433,7 @@ There are many such cases, in particular
 - the **Fourier transform** the most used and known transform
     - linear / non-local / inversible / orthogonal
 - **Hadamard** transform
-    - related to Fourier transform on {-1, 1}
+    - related to Fourier transform on $\{-1 \ldots 1\}$
     - linear / non-local / inversible / orthogonal
 - **wavelet** transform
     - transform on local frequencies
